@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Desert Ant Web Examples</title>
+<style>
+  :root {
+    --bg: #100e0b;
+    --bg2: #17140f;
+    --card: #1c1914;
+    --card-border: #2c2820;
+    --text: #ece6da;
+    --muted: #9a917f;
+    --accent: #e8a33d;
+    --accent-soft: rgba(232, 163, 61, 0.14);
+    --green: #7bc47f;
+    --red: #e07070;
+    --radius: 14px;
+    font-size: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 500px at 70% -10%, rgba(232,163,61,.07), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+  main { max-width: 880px; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+  header h1 {
+    font-size: 2rem; margin: 0 0 .35rem;
+    letter-spacing: -.02em;
+  }
+  header h1 .ant { color: var(--accent); }
+  header p.sub { color: var(--muted); margin: 0 0 2.25rem; max-width: 60ch; }
+  header p.sub a { color: var(--accent); text-decoration: none; }
+  header p.sub a:hover { text-decoration: underline; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .card > summary {
+    display: flex; align-items: center; gap: .9rem;
+    padding: 1rem 1.15rem;
+    cursor: pointer; list-style: none;
+    user-select: none;
+  }
+  .card > summary::-webkit-details-marker { display: none; }
+  .card[open] > summary { border-bottom: 1px solid var(--card-border); }
+  .icon {
+    width: 2.4rem; height: 2.4rem; flex: none;
+    display: grid; place-items: center;
+    background: var(--accent-soft);
+    border-radius: 10px; font-size: 1.2rem;
+  }
+  .title-block { flex: 1; min-width: 0; }
+  .title-block .name { font-weight: 650; }
+  .title-block .desc { color: var(--muted); font-size: .85rem; }
+  .pill {
+    flex: none; font-size: .72rem; font-weight: 600;
+    padding: .22rem .6rem; border-radius: 999px;
+    background: #2a2620; color: var(--muted);
+    white-space: nowrap;
+  }
+  .pill.ready { background: rgba(123,196,127,.15); color: var(--green); }
+  .pill.loading { background: var(--accent-soft); color: var(--accent); }
+  .pill.error { background: rgba(224,112,112,.15); color: var(--red); }
+  .chev { color: var(--muted); transition: transform .15s; flex: none; }
+  .card[open] .chev { transform: rotate(90deg); }
+
+  .body { padding: 1.1rem 1.15rem 1.3rem; }
+  .row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+  textarea, input[type=text] {
+    flex: 1; min-width: 200px;
+    background: var(--bg2); color: var(--text);
+    border: 1px solid var(--card-border); border-radius: 10px;
+    padding: .6rem .75rem; font: inherit; font-size: .92rem;
+    resize: vertical;
+  }
+  textarea:focus, input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+  button {
+    background: var(--accent); color: #1a1206; border: 0;
+    font: inherit; font-weight: 650; font-size: .9rem;
+    padding: .6rem 1.1rem; border-radius: 10px; cursor: pointer;
+  }
+  button:hover { filter: brightness(1.08); }
+  button:disabled { opacity: .45; cursor: default; filter: none; }
+  button.ghost {
+    background: transparent; color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .out { margin-top: 1rem; font-size: .92rem; }
+  .out:empty { margin: 0; }
+  .chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .chip {
+    background: var(--bg2); border: 1px solid var(--card-border);
+    border-radius: 999px; padding: .35rem .8rem;
+    display: inline-flex; gap: .5rem; align-items: baseline;
+  }
+  .chip .emoji { font-size: 1.25rem; }
+  .chip .conf { color: var(--muted); font-size: .78rem; }
+  .bar-row { display: grid; grid-template-columns: 10rem 1fr 3.2rem; gap: .6rem; align-items: center; margin: .3rem 0; font-size: .88rem; }
+  .bar { height: .5rem; background: var(--bg2); border-radius: 999px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+  pre.result {
+    background: var(--bg2); border: 1px solid var(--card-border);
+    border-radius: 10px; padding: .8rem 1rem; overflow-x: auto;
+    font-size: .85rem; margin: 0; white-space: pre-wrap;
+  }
+  mark {
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 4px; padding: 0 .2em; font-weight: 600;
+  }
+  .err { color: var(--red); }
+  .hint { color: var(--muted); font-size: .82rem; margin-top: .5rem; }
+  canvas#shapes-canvas {
+    width: 100%; height: 300px; display: block; touch-action: none;
+    background: var(--bg2); border: 1px solid var(--card-border);
+    border-radius: 10px; cursor: crosshair;
+  }
+  .progress { height: .35rem; background: var(--bg2); border-radius: 999px; overflow: hidden; margin-top: .6rem; }
+  .progress > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  .tree { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82rem; }
+  .tree details { margin-left: 0; }
+  .tree details details { margin-left: 1.1rem; }
+  .tree summary {
+    cursor: pointer; list-style: none; padding: .18rem .3rem; border-radius: 6px;
+    display: flex; align-items: baseline; gap: .5rem;
+  }
+  .tree summary::-webkit-details-marker { display: none; }
+  .tree summary:hover { background: var(--bg2); }
+  .tree .leaf {
+    display: flex; align-items: baseline; gap: .5rem;
+    padding: .18rem .3rem; margin-left: 1.1rem; border-radius: 6px;
+  }
+  .tree .leaf:hover { background: var(--bg2); }
+  .tree .fname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tree .fsize { color: var(--muted); flex: none; }
+  .tree .fmeta { color: var(--muted); flex: none; font-size: .74rem; }
+  .tree .twisty { color: var(--muted); flex: none; width: .8em; transition: transform .12s; }
+  .tree details[open] > summary .twisty { transform: rotate(90deg); }
+  .storage-summary {
+    display: flex; gap: 1.5rem; flex-wrap: wrap;
+    color: var(--muted); font-size: .85rem; margin-bottom: .8rem;
+  }
+  .storage-summary strong { color: var(--text); }
+  footer { color: var(--muted); font-size: .82rem; margin-top: 3rem; text-align: center; }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "@desert-ant-labs/emo": "https://esm.sh/@desert-ant-labs/emo@3.0.0",
+    "@desert-ant-labs/redact": "https://esm.sh/@desert-ant-labs/redact@3.0.0",
+    "@desert-ant-labs/gist": "https://esm.sh/@desert-ant-labs/gist@3.0.0",
+    "@desert-ant-labs/clear": "https://esm.sh/@desert-ant-labs/clear@3.0.0",
+    "@desert-ant-labs/shapes": "https://esm.sh/@desert-ant-labs/shapes@0.7.3",
+    "@desert-ant-labs/tongue": "https://esm.sh/@desert-ant-labs/tongue@3.0.0",
+    "@litertjs/core": "https://esm.sh/@litertjs/core@2.5.2"
+  }
+}
+</script>
+<script>
+  // Instrument fetch before any module loads, so every model / wasm / weights
+  // download the SDKs make is recorded (URL + Content-Length). Module imports
+  // themselves go through the module loader, not fetch; those are merged in
+  // later from the Resource Timing API.
+  (() => {
+    const log = (window.__dalFetchLog = new Map());
+    const orig = window.fetch.bind(window);
+    window.fetch = async (input, init) => {
+      const res = await orig(input, init);
+      try {
+        const url = typeof input === "string" ? input : input.url;
+        if (/^https?:/.test(url)) {
+          const size = Number(res.headers.get("content-length")) || 0;
+          const prev = log.get(url);
+          if (!prev || size > prev.size) log.set(url, { size, fromFetch: true });
+          window.dispatchEvent(new Event("dal-download"));
+        }
+      } catch {}
+      return res;
+    };
+  })();
+</script>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Desert <span class="ant">Ant</span> Web Examples</h1>
+    <p class="sub">
+      Every <a href="https://desertant.com">Desert Ant Labs</a> on-device model that runs
+      in the browser — WebAssembly + LiteRT.js, no server, no API keys. Models download
+      on demand the first time you run an example and are cached by the browser.
+    </p>
+  </header>
+
+  <!-- ═══ Emo ═══ -->
+  <details class="card" id="card-emo">
+    <summary>
+      <span class="icon">😊</span>
+      <span class="title-block">
+        <span class="name">Emo</span><br />
+        <span class="desc">Suggests emoji for a piece of text, with confidences</span>
+      </span>
+      <span class="pill" data-pill>not loaded</span>
+      <span class="chev">›</span>
+    </summary>
+    <div class="body">
+      <div class="row">
+        <input type="text" id="emo-input" value="Pay my bills" />
+        <button id="emo-run">Suggest</button>
+      </div>
+      <div class="progress" hidden><i></i></div>
+      <div class="out" id="emo-out"></div>
+    </div>
+  </details>
+
+  <!-- ═══ Redact ═══ -->
+  <details class="card" id="card-redact">
+    <summary>
+      <span class="icon">🕵️</span>
+      <span class="title-block">
+        <span class="name">Redact</span><br />
+        <span class="desc">Redacts PII (names, phone numbers, emails, …) from text</span>
+      </span>
+      <span class="pill" data-pill>not loaded</span>
+      <span class="chev">›</span>
+    </summary>
+    <div class="body">
+      <div class="row">
+        <textarea id="redact-input" rows="3">Hi, I'm Maria Fernandez. Reach me at maria@example.com or +1 (415) 555-0192.</textarea>
+      </div>
+      <div class="row" style="margin-top:.6rem"><button id="redact-run">Redact</button></div>
+      <div class="progress" hidden><i></i></div>
+      <div class="out" id="redact-out"></div>
+    </div>
+  </details>
+
+  <!-- ═══ Gist ═══ -->
+  <details class="card" id="card-gist">
+    <summary>
+      <span class="icon">🏷️</span>
+      <span class="title-block">
+        <span class="name">Gist</span><br />
+        <span class="desc">Classifies text into topics with scores</span>
+      </span>
+      <span class="pill" data-pill>not loaded</span>
+      <span class="chev">›</span>
+    </summary>
+    <div class="body">
+      <div class="row">
+        <textarea id="gist-input" rows="3">The team shipped the new training pipeline last night — inference latency dropped 40% and the model now runs entirely on-device.</textarea>
+      </div>
+      <div class="row" style="margin-top:.6rem"><button id="gist-run">Classify</button></div>
+      <div class="progress" hidden><i></i></div>
+      <div class="out" id="gist-out"></div>
+    </div>
+  </details>
+
+  <!-- ═══ Tongue ═══ -->
+  <details class="card" id="card-tongue">
+    <summary>
+      <span class="icon">🌍</span>
+      <span class="title-block">
+        <span class="name">Tongue</span><br />
+        <span class="desc">Language identification for short text, 84 languages — pure JS, no wasm</span>
+      </span>
+      <span class="pill" data-pill>not loaded</span>
+      <span class="chev">›</span>
+    </summary>
+    <div class="body">
+      <div class="row">
+        <input type="text" id="tongue-input" value="kann ich das haben" />
+        <button id="tongue-run">Detect</button>
+      </div>
+      <div class="progress" hidden><i></i></div>
+      <div class="out" id="tongue-out"></div>
+    </div>
+  </details>
+
+  <!-- ═══ Shapes ═══ -->
+  <details class="card" id="card-shapes">
+    <summary>
+      <span class="icon">✏️</span>
+      <span class="title-block">
+        <span class="name">Shapes</span><br />
+        <span class="desc">Draw on a canvas, recognizes and snaps the shape</span>
+      </span>
+      <span class="pill" data-pill>not loaded</span>
+      <span class="chev">›</span>
+    </summary>
+    <div class="body">
+      <canvas id="shapes-canvas"></canvas>
+      <div class="row" style="margin-top:.6rem">
+        <button class="ghost" id="shapes-clear">Clear</button>
+        <span class="hint" id="shapes-hint">Draw a single stroke — line, rectangle, triangle, ellipse, or star.</span>
+      </div>
+      <div class="progress" hidden><i></i></div>
+      <div class="out" id="shapes-out"></div>
+    </div>
+  </details>
+
+  <!-- ═══ Clear ═══ -->
+  <details class="card" id="card-clear">
+    <summary>
+      <span class="icon">🎙️</span>
+      <span class="title-block">
+        <span class="name">Clear</span><br />
+        <span class="desc">Records mic audio, enhances it, and plays original vs. enhanced</span>
+      </span>
+      <span class="pill" data-pill>not loaded</span>
+      <span class="chev">›</span>
+    </summary>
+    <div class="body">
+      <div class="row">
+        <button id="clear-record">● Record 5 s</button>
+        <button class="ghost" id="clear-play-orig" disabled>Play original</button>
+        <button class="ghost" id="clear-play-enh" disabled>Play enhanced</button>
+      </div>
+      <div class="progress" hidden><i></i></div>
+      <div class="out" id="clear-out"></div>
+      <p class="hint">Needs microphone access. Denoises, dereverbs, and loudness-normalizes to podcast-ready 48 kHz.</p>
+    </div>
+  </details>
+
+  <!-- ═══ Downloaded files ═══ -->
+  <details class="card" id="card-files">
+    <summary>
+      <span class="icon">🗄️</span>
+      <span class="title-block">
+        <span class="name">Downloaded files</span><br />
+        <span class="desc">Everything fetched this session — models, weights, wasm runtime, SDK modules</span>
+      </span>
+      <span class="pill" data-pill>0 files</span>
+      <span class="chev">›</span>
+    </summary>
+    <div class="body">
+      <div class="storage-summary" id="files-summary"></div>
+      <div class="tree" id="files-tree"></div>
+      <p class="hint">On the web, model bytes live in memory and re-fetches are served by the
+      browser's HTTP cache — there is no on-disk model directory to browse like on iOS.
+      This is the live download log for this page session; sizes come from
+      <code>Content-Length</code> and the Resource Timing API (blank when a CDN
+      withholds cross-origin timing sizes).</p>
+    </div>
+  </details>
+
+  <footer>
+    Built on <a href="https://github.com/Desert-Ant-Labs/desert-ant-core">desert-ant-core</a> ·
+    models cached on-device after first download
+  </footer>
+</main>
+
+<script type="module">
+import * as litert from "@litertjs/core";
+
+const LITERT_WASM_DIR = "https://unpkg.com/@litertjs/core@2.5.2/wasm/";
+const TONGUE_MODEL_DIR = "https://unpkg.com/@desert-ant-labs/tongue@3.0.0/dist";
+
+// A stable per-device id, persisted across reloads.
+function deviceId() {
+  let id = localStorage.getItem("dalDeviceId");
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem("dalDeviceId", id); }
+  return id;
+}
+
+// ── shared card plumbing: status pill, progress bar, lazy loading ────────────
+function card(name) {
+  const el = document.getElementById(`card-${name}`);
+  const pill = el.querySelector("[data-pill]");
+  const prog = el.querySelector(".progress");
+  const bar = prog?.querySelector("i");
+  return {
+    el,
+    setStatus(cls, text) { pill.className = `pill ${cls}`; pill.textContent = text; },
+    progress(f) {
+      if (!prog) return;
+      if (f == null) { prog.hidden = true; return; }
+      prog.hidden = false; bar.style.width = `${Math.round(f * 100)}%`;
+    },
+  };
+}
+
+function lazyLoader(name, loadFn) {
+  const c = card(name);
+  let promise = null;
+  return () => {
+    if (!promise) {
+      c.setStatus("loading", "downloading…");
+      promise = loadFn((f) => c.progress(f))
+        .then((m) => { c.setStatus("ready", "ready"); c.progress(null); return m; })
+        .catch((e) => {
+          c.setStatus("error", "error"); c.progress(null); promise = null; throw e;
+        });
+    }
+    return promise;
+  };
+}
+
+const showErr = (out, e) => { out.innerHTML = `<span class="err">${String(e?.message ?? e)}</span>`; };
+
+// ── Emo ──────────────────────────────────────────────────────────────────────
+{
+  const out = document.getElementById("emo-out");
+  const load = lazyLoader("emo", async (onProgress) => {
+    const { Emo } = await import("@desert-ant-labs/emo");
+    return Emo.load({ litert, litertWasmDir: LITERT_WASM_DIR, onProgress });
+  });
+  const run = async () => {
+    out.textContent = "…";
+    try {
+      const emo = await load();
+      const t0 = performance.now();
+      const suggestions = await emo.suggestions(
+        document.getElementById("emo-input").value, { limit: 5, deviceId });
+      const ms = Math.round(performance.now() - t0);
+      out.innerHTML = `<div class="chips">${suggestions.map((s) =>
+        `<span class="chip"><span class="emoji">${s.emoji}</span><span class="conf">${(s.confidence * 100).toFixed(0)}%</span></span>`
+      ).join("")}</div><p class="hint">${ms} ms</p>`;
+    } catch (e) { showErr(out, e); }
+  };
+  document.getElementById("emo-run").addEventListener("click", run);
+  document.getElementById("emo-input").addEventListener("keydown", (e) => e.key === "Enter" && run());
+}
+
+// ── Redact ───────────────────────────────────────────────────────────────────
+{
+  const out = document.getElementById("redact-out");
+  const load = lazyLoader("redact", async (onProgress) => {
+    const { Redact } = await import("@desert-ant-labs/redact");
+    return Redact.load({ litert, litertWasmDir: LITERT_WASM_DIR, onProgress });
+  });
+  document.getElementById("redact-run").addEventListener("click", async () => {
+    out.textContent = "…";
+    try {
+      const redact = await load();
+      const r = await redact.redaction(
+        document.getElementById("redact-input").value, { deviceId });
+      const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      let html = esc(r.redactedText);
+      for (const item of r.items)
+        html = html.replace(esc(item.placeholder), `<mark>${esc(item.placeholder)}</mark>`);
+      out.innerHTML = `<pre class="result">${html}</pre>` + (r.items.length
+        ? `<p class="hint">${r.items.map((i) => `${i.label} “${esc(i.original)}” (${(i.confidence * 100).toFixed(0)}%)`).join(" · ")}</p>`
+        : `<p class="hint">Nothing to redact.</p>`);
+    } catch (e) { showErr(out, e); }
+  });
+}
+
+// ── Gist ─────────────────────────────────────────────────────────────────────
+{
+  const out = document.getElementById("gist-out");
+  const load = lazyLoader("gist", async (onProgress) => {
+    const { Gist } = await import("@desert-ant-labs/gist");
+    return Gist.load({ litert, litertWasmDir: LITERT_WASM_DIR, onProgress });
+  });
+  document.getElementById("gist-run").addEventListener("click", async () => {
+    out.textContent = "…";
+    try {
+      const gist = await load();
+      const topics = await gist.classify(
+        document.getElementById("gist-input").value, { deviceId });
+      out.innerHTML = topics.length
+        ? topics.map((t) =>
+            `<div class="bar-row"><span>${t.topic ?? t.label ?? t.name}</span><span class="bar"><i style="width:${Math.round((t.score ?? 0) * 100)}%"></i></span><span class="conf">${((t.score ?? 0) * 100).toFixed(0)}%</span></div>`
+          ).join("")
+        : `<p class="hint">No topics above threshold.</p>`;
+    } catch (e) { showErr(out, e); }
+  });
+}
+
+// ── Tongue ───────────────────────────────────────────────────────────────────
+{
+  const out = document.getElementById("tongue-out");
+  const load = lazyLoader("tongue", async () => {
+    const { Tongue } = await import("@desert-ant-labs/tongue");
+    return Tongue.load({ from: TONGUE_MODEL_DIR });
+  });
+  const run = async () => {
+    out.textContent = "…";
+    try {
+      const tongue = await load();
+      const d = tongue.detect(document.getElementById("tongue-input").value);
+      out.innerHTML = d.language
+        ? `<div class="chips"><span class="chip"><span class="emoji">${d.language}</span><span class="conf">${d.reliability}${d.isTooCloseToCall ? " · too close to call" : ""}</span></span></div>` +
+          `<p class="hint">Candidates: ${d.candidates.map((c) => `${c.language ?? c.code ?? "?"} ${((c.probability ?? c.score ?? 0) * 100).toFixed(0)}%`).join(" · ")}</p>`
+        : `<p class="hint">Empty input.</p>`;
+    } catch (e) { showErr(out, e); }
+  };
+  document.getElementById("tongue-run").addEventListener("click", run);
+  document.getElementById("tongue-input").addEventListener("keydown", (e) => e.key === "Enter" && run());
+}
+
+// ── Shapes ───────────────────────────────────────────────────────────────────
+{
+  const out = document.getElementById("shapes-out");
+  const canvas = document.getElementById("shapes-canvas");
+  const ctx = canvas.getContext("2d");
+  const load = lazyLoader("shapes", async (onProgress) => {
+    const { Shapes } = await import("@desert-ant-labs/shapes");
+    return Shapes.load({ litert, litertWasmDir: LITERT_WASM_DIR, onProgress });
+  });
+
+  const dpr = () => window.devicePixelRatio || 1;
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    canvas.width = r.width * dpr(); canvas.height = r.height * dpr();
+    ctx.setTransform(dpr(), 0, 0, dpr(), 0, 0);
+  }
+  new ResizeObserver(resize).observe(canvas);
+
+  let stroke = [], drawing = false;
+  const pos = (e) => {
+    const r = canvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+  const clear = () => { const r = canvas.getBoundingClientRect(); ctx.clearRect(0, 0, r.width, r.height); };
+  const style = (color) => { ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = ctx.lineCap = "round"; };
+
+  function drawStroke() {
+    style("#9a917f");
+    ctx.beginPath();
+    stroke.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+    ctx.stroke();
+  }
+
+  function drawShape(s) {
+    style("#e8a33d");
+    ctx.beginPath();
+    if (s.kind === "line") { ctx.moveTo(s.from.x, s.from.y); ctx.lineTo(s.to.x, s.to.y); }
+    else if (s.kind === "rectangle" || s.kind === "triangle") {
+      const pts = s.corners ?? s.vertices;
+      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+      ctx.closePath();
+    } else if (s.kind === "ellipse") {
+      ctx.ellipse(s.center.x, s.center.y, s.semiMajor, s.semiMinor, s.rotation, 0, 2 * Math.PI);
+    } else if (s.kind === "star") {
+      const n = s.pointCount * 2;
+      for (let i = 0; i < n; i++) {
+        const r = i % 2 === 0 ? s.outerRadius : s.innerRadius;
+        const a = s.rotation + (i * Math.PI) / s.pointCount - Math.PI / 2;
+        const x = s.center.x + r * Math.cos(a), y = s.center.y + r * Math.sin(a);
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.closePath();
+    }
+    ctx.stroke();
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    drawing = true; stroke = [pos(e)]; clear(); out.textContent = "";
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drawing) return;
+    stroke.push(pos(e)); clear(); drawStroke();
+  });
+  canvas.addEventListener("pointerup", async () => {
+    drawing = false;
+    if (stroke.length < 2) return;
+    out.textContent = "…";
+    try {
+      const shapes = await load();
+      const shape = await shapes.recognize(stroke, { deviceId });
+      clear(); drawStroke();
+      if (shape) { drawShape(shape); out.innerHTML = `<p class="hint">Recognized: <strong>${shape.kind}</strong></p>`; }
+      else out.innerHTML = `<p class="hint">No shape recognized — try a cleaner stroke.</p>`;
+    } catch (e) { showErr(out, e); }
+  });
+  document.getElementById("shapes-clear").addEventListener("click", () => { stroke = []; clear(); out.textContent = ""; });
+  // Warm the model when the card opens.
+  document.getElementById("card-shapes").addEventListener("toggle", (e) => e.target.open && load().catch(() => {}));
+}
+
+// ── Clear ────────────────────────────────────────────────────────────────────
+{
+  const out = document.getElementById("clear-out");
+  const btnRec = document.getElementById("clear-record");
+  const btnOrig = document.getElementById("clear-play-orig");
+  const btnEnh = document.getElementById("clear-play-enh");
+  const load = lazyLoader("clear", async (onProgress) => {
+    const { Clear } = await import("@desert-ant-labs/clear");
+    return Clear.load({ litert, litertWasmDir: LITERT_WASM_DIR, onProgress });
+  });
+
+  let original = null, enhanced = null, audioCtx = null;
+  const ac = () => (audioCtx ??= new AudioContext());
+
+  function play(samples, sampleRate) {
+    const ctx = ac();
+    const buf = ctx.createBuffer(1, samples.length, sampleRate);
+    buf.copyToChannel(samples instanceof Float32Array ? samples : Float32Array.from(samples), 0);
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.connect(ctx.destination); src.start();
+  }
+
+  btnRec.addEventListener("click", async () => {
+    btnRec.disabled = true;
+    out.textContent = "Recording… speak now.";
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      const chunks = [];
+      rec.ondataavailable = (e) => chunks.push(e.data);
+      const stopped = new Promise((res) => (rec.onstop = res));
+      rec.start();
+      await new Promise((r) => setTimeout(r, 5000));
+      rec.stop(); await stopped;
+      stream.getTracks().forEach((t) => t.stop());
+
+      out.textContent = "Decoding + enhancing…";
+      const bytes = await new Blob(chunks).arrayBuffer();
+      const decoded = await ac().decodeAudioData(bytes);
+      original = { samples: decoded.getChannelData(0).slice(), sampleRate: decoded.sampleRate };
+      btnOrig.disabled = false;
+
+      const clear = await load();
+      const r = await clear.enhance(original.samples, original.sampleRate, { deviceId });
+      enhanced = { samples: r.samples, sampleRate: r.sampleRate };
+      btnEnh.disabled = false;
+      out.innerHTML = `<p class="hint">Enhanced ${r.durationSec.toFixed(1)} s of audio in ${r.processingSec.toFixed(2)} s.</p>`;
+    } catch (e) { showErr(out, e); }
+    finally { btnRec.disabled = false; }
+  });
+  btnOrig.addEventListener("click", () => original && play(original.samples, original.sampleRate));
+  btnEnh.addEventListener("click", () => enhanced && play(enhanced.samples, enhanced.sampleRate));
+}
+
+// ── Downloaded files ─────────────────────────────────────────────────────────
+{
+  const c = card("files");
+  const treeEl = document.getElementById("files-tree");
+  const summaryEl = document.getElementById("files-summary");
+
+  const fmtSize = (n) => {
+    if (!n) return "—";
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 ** 2) return `${(n / 1024).toFixed(1)} KB`;
+    if (n < 1024 ** 3) return `${(n / 1024 ** 2).toFixed(1)} MB`;
+    return `${(n / 1024 ** 3).toFixed(2)} GB`;
+  };
+
+  // Merge the fetch log (SDK model/wasm downloads) with Resource Timing
+  // entries (module imports, importmap-loaded SDKs). Dedupe by URL, keep the
+  // largest known size.
+  function collect() {
+    const files = new Map(window.__dalFetchLog);
+    for (const e of performance.getEntriesByType("resource")) {
+      if (!/^https?:/.test(e.name)) continue;
+      const size = e.decodedBodySize || e.transferSize || 0;
+      const prev = files.get(e.name);
+      if (!prev) files.set(e.name, { size });
+      else if (size > prev.size) prev.size = size;
+    }
+    return files;
+  }
+
+  // Build origin → path-segment tree with per-folder rollups.
+  function buildTree(files) {
+    const root = { dirs: new Map(), files: [], size: 0, count: 0 };
+    for (const [url, info] of files) {
+      let u;
+      try { u = new URL(url); } catch { continue; }
+      const segments = [u.host, ...u.pathname.split("/").filter(Boolean)];
+      const name = segments.pop() || "/";
+      let node = root;
+      for (const seg of segments) {
+        if (!node.dirs.has(seg)) node.dirs.set(seg, { dirs: new Map(), files: [], size: 0, count: 0 });
+        node = node.dirs.get(seg);
+        node.size += info.size; node.count += 1;
+      }
+      node.files.push({ name, size: info.size });
+      root.size += info.size; root.count += 1;
+    }
+    // Collapse chains of single-child folders (huggingface paths get deep).
+    function collapse(node) {
+      for (const [seg, child] of [...node.dirs]) {
+        let label = seg, cur = child;
+        while (cur.dirs.size === 1 && cur.files.length === 0) {
+          const [[nextSeg, next]] = cur.dirs;
+          label += "/" + nextSeg; cur = next;
+        }
+        node.dirs.delete(seg); node.dirs.set(label, cur);
+        collapse(cur);
+      }
+    }
+    collapse(root);
+    return root;
+  }
+
+  function renderNode(name, node, depth) {
+    const kids = [
+      ...[...node.dirs].sort((a, b) => b[1].size - a[1].size).map(([seg, child]) => renderNode(seg, child, depth + 1)),
+      ...node.files.sort((a, b) => b.size - a.size).map((f) =>
+        `<div class="leaf"><span class="twisty"></span><span class="fname" title="${f.name}">${f.name}</span><span class="fsize">${fmtSize(f.size)}</span></div>`),
+    ].join("");
+    return `<details ${depth < 1 ? "open" : ""}><summary><span class="twisty">›</span><span class="fname">${name}</span><span class="fmeta">${node.count} file${node.count === 1 ? "" : "s"}</span><span class="fsize">${fmtSize(node.size)}</span></summary>${kids}</details>`;
+  }
+
+  // Preserve which folders the user opened across re-renders.
+  function openPaths() {
+    const open = new Set();
+    treeEl.querySelectorAll("details[open]").forEach((d) => open.add(d.querySelector(".fname")?.textContent));
+    return open;
+  }
+
+  async function render() {
+    const files = collect();
+    const tree = buildTree(files);
+    const open = openPaths();
+    treeEl.innerHTML = [...tree.dirs].sort((a, b) => b[1].size - a[1].size)
+      .map(([host, node]) => renderNode(host, node, 0)).join("");
+    treeEl.querySelectorAll("details").forEach((d) => {
+      if (open.has(d.querySelector(".fname")?.textContent)) d.open = true;
+    });
+    c.setStatus(tree.count ? "ready" : "", `${tree.count} file${tree.count === 1 ? "" : "s"} · ${fmtSize(tree.size)}`);
+
+    let storage = "";
+    try {
+      const est = await navigator.storage?.estimate?.();
+      if (est?.usage != null)
+        storage = `<span>origin storage <strong>${fmtSize(est.usage)}</strong> of ${fmtSize(est.quota)} quota</span>`;
+    } catch {}
+    summaryEl.innerHTML =
+      `<span>downloaded <strong>${fmtSize(tree.size)}</strong> across <strong>${tree.count}</strong> files</span>${storage}`;
+  }
+
+  let scheduled = false;
+  const scheduleRender = () => {
+    if (scheduled) return;
+    scheduled = true;
+    setTimeout(() => { scheduled = false; render(); }, 300);
+  };
+  window.addEventListener("dal-download", scheduleRender);
+  new PerformanceObserver(scheduleRender).observe({ type: "resource", buffered: true });
+  document.getElementById("card-files").addEventListener("toggle", (e) => e.target.open && render());
+  render();
+}
+</script>
+</body>
+</html>
