@@ -1,0 +1,59 @@
+/* Desert Ant Labs — iOS
+ * -------------------------------------------------------------------------
+ * A minimal layer on top of the core tokens for on-device demo apps. Same
+ * colors (the semantic aliases already theme light/dark), same fonts. This
+ * only adds the iOS-specific metrics — chrome heights, safe areas, control
+ * sizing, the app-icon squircle — and a type scale tuned to Apple's roles
+ * but set in the brand faces (Hanken Grotesk UI, Instrument Serif large
+ * titles, JetBrains Mono for data/labels).
+ * ------------------------------------------------------------------------- */
+
+:root {
+  /* ---- Frame (no device bezel — just the app surface) ---------------- */
+  --ios-screen-w:        390px;   /* iPhone logical width */
+  --ios-screen-h:        844px;
+  --ios-screen-radius:   44px;    /* display corner radius */
+
+  /* ---- Chrome heights ------------------------------------------------- */
+  --ios-statusbar-h:     54px;    /* status bar + Dynamic Island band */
+  --ios-navbar-h:        44px;    /* inline title bar */
+  --ios-largetitle-h:    52px;    /* large-title band below the nav bar */
+  --ios-tabbar-h:        49px;
+  --ios-toolbar-h:       49px;
+  --ios-home-indicator:  34px;    /* bottom safe area */
+
+  /* ---- Layout --------------------------------------------------------- */
+  --ios-gutter:          16px;    /* screen edge padding */
+  --ios-inset-gutter:    16px;    /* inset grouped-list side margin */
+  --ios-row-h:           44px;    /* standard list row */
+  --ios-row-h-lg:        58px;    /* row with subtitle */
+  --ios-row-h-xl:        72px;    /* media row */
+
+  /* ---- Radii (iOS reads softer than the web side) -------------------- */
+  --ios-radius-card:     12px;    /* grouped list container / cards */
+  --ios-radius-control:  10px;    /* buttons, fields, segmented */
+  --ios-radius-tile:     18px;    /* large feature tiles */
+  --ios-radius-icon:     22.37%;  /* app-icon squircle (superellipse approx) */
+  --ios-hairline:        0.5px;   /* iOS separators are sub-pixel */
+
+  /* ---- Type roles · Apple metrics, brand faces ----------------------- */
+  /* Large titles use the serif display for brand voice; everything
+     functional uses Hanken Grotesk; data/labels use the mono. */
+  --ios-large-title:  34px;   /* font-display */
+  --ios-title-1:      28px;
+  --ios-title-2:      22px;
+  --ios-title-3:      20px;
+  --ios-headline:     17px;   /* semibold */
+  --ios-body:         17px;
+  --ios-callout:      16px;
+  --ios-subhead:      15px;
+  --ios-footnote:     13px;
+  --ios-caption-1:    12px;
+  --ios-caption-2:    11px;
+
+  /* ---- iOS control fills (semantic, theme-aware) --------------------- */
+  --ios-fill-primary:    color-mix(in srgb, var(--text-primary) 8%, transparent);
+  --ios-fill-secondary:  color-mix(in srgb, var(--text-primary) 5%, transparent);
+  --ios-separator:       color-mix(in srgb, var(--text-primary) 12%, transparent);
+  --ios-chrome-bg:       color-mix(in srgb, var(--bg-surface) 78%, transparent);  /* frosted bars */
+}
