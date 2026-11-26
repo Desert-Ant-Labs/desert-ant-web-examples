@@ -1,7 +1,5 @@
 # Desert Ant Web Examples
 
-[![Demo](https://img.shields.io/badge/%E2%96%B6%EF%B8%8E_Demo-open_in_browser-2D52C8?style=for-the-badge)](https://desert-ant-labs.github.io/desert-ant-web-examples/)
-
 A single-page playground demonstrating every [Desert Ant Labs](https://desertant.com)
 on-device model that runs in the browser. The web counterpart of
 [desert-ant-ios-examples](../desert-ant-ios-examples): each model has its own
